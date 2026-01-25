@@ -1,0 +1,19 @@
+ Admin Guide
+
+## Security
+
+### SSL Configuration
+TLS certificates must be rotated every 90 days.
+The configuration file is located at /etc/ssl/config.yaml.
+Restart the gateway service after renewal.
+
+### Authentication
+TLS is also used during OAuth authentication.
+OAuth tokens expire every 24 hours.
+Token refresh does not require certificate rotation.
+
+## Networking
+
+### Gateway Configuration
+The gateway handles TLS termination.
+Improper TLS settings may cause downtime.
