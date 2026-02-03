@@ -1,34 +1,40 @@
 import { useState } from "react";
-import { chat, uploadFile, ingestFile } from "./services/api";
-import UploadIcon from "./assets/file_upload_logo.png";
-  
+import { chat, ingestFile } from "./services/api";
+import UploadBox from "./components/UploadBox";
+import Sidebar from "./components/Sidebar";
+import BottomBar from "./components/BottomBar";
+
 
 function App() {
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState("hierarchy");
   const [messages, setMessages] = useState([]);
-  const [chunks, setChunks] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [uploadStatus, setUploadStatus] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState("");
   const [ingestStatus, setIngestStatus] = useState("");
+
+  // 🔑 Chat history state (basic for now)
+  const [chats, setChats] = useState([
+    { id: "1", title: "Banking Law" },
+    { id: "2", title: "Tax Code" },
+  ]);
+  const [activeChatId, setActiveChatId] = useState("1");
 
   const runQuery = async () => {
     if (!query.trim()) return;
 
-    const userMsg = { role: "user", content: query };
-    setMessages((m) => [...m, userMsg]);
+    setMessages((m) => [...m, { role: "user", content: query }]);
     setQuery("");
     setLoading(true);
 
     try {
-      const res = await chat(userMsg.content, mode);
+      const res = await chat(query, mode);
       setMessages((m) => [
         ...m,
         { role: "assistant", content: res.answer },
       ]);
-      setChunks(res.chunks);
     } catch {
       setMessages((m) => [
         ...m,
@@ -40,49 +46,50 @@ function App() {
 
   return (
     <div style={styles.app}>
-      {/* ================= CENTER ================= */}
+      {/* ========== LEFT SIDEBAR ========== */}
+      <Sidebar
+        chats={chats}
+        activeChatId={activeChatId}
+        onNewChat={() => {
+          const id = Date.now().toString();
+          setChats((c) => [
+            { id, title: "New Chat" },
+            ...c,
+          ]);
+          setActiveChatId(id);
+          setMessages([]);
+          setUploadedFile(null);
+          setIngestStatus("");
+        }}
+        onSelectChat={(id) => {
+          setActiveChatId(id);
+          setMessages([]);
+        }}
+      />
+
+      {/* ========== CENTER ========== */}
       <div style={styles.center}>
-        {/* Upload state */}
         {!uploadedFile && (
-<div style={styles.uploadBox}>
-  <img
-    src={UploadIcon}
-    alt="Upload"
-    style={{ width: 96, opacity: 0.9, marginBottom: 12 }}
-  />
-
-  <h2>Upload legal document</h2>
-
-  <label style={{ cursor: "pointer", color: "#555" }}>
-    Click to browse or drag & drop
-    <input
-      type="file"
-      accept=".pdf,.txt,.md"
-      hidden
-      onChange={async (e) => {
-        const file = e.target.files[0];
-        e.target.value = "";
-        if (!file) return;
-
-        setUploadStatus("Uploading...");
-        try {
-          const res = await uploadFile(file);
-          setUploadedFile(res.filename);
-          setUploadStatus(`Uploaded: ${res.filename}`);
-        } catch {
-          setUploadStatus("❌ Upload failed");
-        }
-      }}
-    />
-  </label>
-
-  <small style={{ marginTop: 8, display: "block" }}>
-    {uploadStatus}
-  </small>
-</div>
+          <UploadBox
+            uploadStatus={uploadStatus}
+            setUploadStatus={setUploadStatus}
+            onUploadSuccess={setUploadedFile}
+          />
         )}
 
-        {/* Chat messages */}
+        {uploadedFile && (
+          <button
+            onClick={async () => {
+              setIngestStatus("Ingesting...");
+              await ingestFile(uploadedFile);
+              setIngestStatus("✅ Ready");
+            }}
+          >
+            Ingest document
+          </button>
+        )}
+
+        {/* Chat area */}
         <div style={styles.chatArea}>
           {messages.map((m, i) => (
             <div
@@ -90,7 +97,6 @@ function App() {
               style={{
                 ...styles.message,
                 alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                background: m.role === "user" ? "#daf" : "#eee",
               }}
             >
               {m.content}
@@ -99,113 +105,29 @@ function App() {
           {loading && <div style={styles.message}>Thinking…</div>}
         </div>
 
-        {/* ================= INPUT ================= */}
-        <div style={styles.inputBar}>
-          <textarea
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask about the document…"
-            disabled={!ingestStatus.startsWith("✅")}
-            style={styles.textarea}
-          />
+        <BottomBar
+          query={query}
+          setQuery={setQuery}
+          onSend={runQuery}
+          disabled={!ingestStatus.startsWith("✅") || loading}
+          mode={mode}
+          setMode={setMode}
+        />
 
-          <button
-            onClick={runQuery}
-            disabled={loading || !ingestStatus.startsWith("✅")}
-          >
-            Send
-          </button>
-        </div>
-      </div>
 
-      {/* ================= RIGHT SIDEBAR ================= */}
-      <div style={styles.sidebar}>
-        <button
-          onClick={async () => {
-            setIngestStatus("Ingesting...");
-            try {
-              await ingestFile(uploadedFile);
-              setIngestStatus("✅ Ready");
-            } catch {
-              setIngestStatus("❌ Ingest failed");
-            }
-          }}
-          disabled={!uploadedFile}
-        >
-          Ingest
-        </button>
-
-        <div style={{ marginTop: 10 }}>
-          <label>
-            <input
-              type="radio"
-              checked={mode === "flat"}
-              onChange={() => setMode("flat")}
-            />{" "}
-            Flat
-          </label>
-          <br />
-          <label>
-            <input
-              type="radio"
-              checked={mode === "hierarchy"}
-              onChange={() => setMode("hierarchy")}
-            />{" "}
-            Hierarchy
-          </label>
-        </div>
-
-        <small>{ingestStatus}</small>
       </div>
     </div>
   );
 }
 
-/* ================= STYLES ================= */
-
+/* styles */
 const styles = {
-  app: {
-    display: "flex",
-    height: "100vh",
-    fontFamily: "sans-serif",
-  },
-  center: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-  },
-  uploadBox: {
-    margin: "auto",
-    textAlign: "center",
-  },
-  chatArea: {
-    flex: 1,
-    padding: 20,
-    overflowY: "auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  message: {
-    maxWidth: "70%",
-    padding: 10,
-    borderRadius: 8,
-  },
-  inputBar: {
-    display: "flex",
-    gap: 10,
-    padding: 10,
-    borderTop: "1px solid #ddd",
-  },
-  textarea: {
-    flex: 1,
-    height: 60,
-  },
-  sidebar: {
-    width: 260,
-    borderLeft: "1px solid #ddd",
-    padding: 16,
-  },
+  app: { display: "flex", height: "100vh", fontFamily: "sans-serif" },
+  center: { flex: 1, display: "flex", flexDirection: "column" },
+  chatArea: { flex: 1, padding: 16, overflowY: "auto" },
+  message: { padding: 10, borderRadius: 8, background: "#f3f4f6", maxWidth: "70%" },
+  bottomBar: { borderTop: "1px solid #ddd", padding: 10 },
+  inputBox: { display: "flex", gap: 8, marginTop: 8 },
 };
 
 export default App;
