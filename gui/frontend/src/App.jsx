@@ -67,55 +67,50 @@ function App() {
         }}
       />
 
-      {/* ========== CENTER ========== */}
-      <div style={styles.center}>
-        {!uploadedFile && (
+    {/* ========== CENTER ========== */}
+    <div style={styles.center}>
+      {/* Upload state (centered perfectly) */}
+      {!uploadedFile && (
+        <div style={styles.uploadWrapper}>
           <UploadBox
             uploadStatus={uploadStatus}
             setUploadStatus={setUploadStatus}
             onUploadSuccess={setUploadedFile}
           />
-        )}
-
-        {uploadedFile && (
-          <button
-            onClick={async () => {
-              setIngestStatus("Ingesting...");
-              await ingestFile(uploadedFile);
-              setIngestStatus("✅ Ready");
-            }}
-          >
-            Ingest document
-          </button>
-        )}
-
-        {/* Chat area */}
-        <div style={styles.chatArea}>
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              style={{
-                ...styles.message,
-                alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-              }}
-            >
-              {m.content}
-            </div>
-          ))}
-          {loading && <div style={styles.message}>Thinking…</div>}
         </div>
+      )}
 
-        <BottomBar
-          query={query}
-          setQuery={setQuery}
-          onSend={runQuery}
-          disabled={!ingestStatus.startsWith("✅") || loading}
-          mode={mode}
-          setMode={setMode}
-        />
+      {/* Chat state */}
+      {uploadedFile && (
+        <>
+          {/* Chat area */}
+          <div style={styles.chatArea}>
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                style={{
+                  ...styles.message,
+                  alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+                }}
+              >
+                {m.content}
+              </div>
+            ))}
+            {loading && <div style={styles.message}>Thinking…</div>}
+          </div>
 
+          <BottomBar
+            query={query}
+            setQuery={setQuery}
+            onSend={runQuery}
+            disabled={!ingestStatus.startsWith("✅") || loading}
+            mode={mode}
+            setMode={setMode}
+          />
+        </>
+      )}
+    </div>
 
-      </div>
     </div>
   );
 }
@@ -128,6 +123,16 @@ const styles = {
   message: { padding: 10, borderRadius: 8, background: "#f3f4f6", maxWidth: "70%" },
   bottomBar: { borderTop: "1px solid #ddd", padding: 10 },
   inputBox: { display: "flex", gap: 8, marginTop: 8 },
+  uploadBox: {
+  margin: "auto",
+  textAlign: "center",
+},
+  uploadWrapper: {
+  flex: 1,
+  display: "flex",
+  alignItems: "center",     // vertical center ✅
+  justifyContent: "center" // horizontal center ✅
+}
 };
 
 export default App;
