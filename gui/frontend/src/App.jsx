@@ -105,9 +105,9 @@ function App() {
 const styles = {
   app: { display: "flex", height: "100vh", fontFamily: "sans-serif" },
   center: { flex: 1, display: "flex", flexDirection: "column" },
-  chatArea: { flex: 1, padding: 16, overflowY: "auto" },
+  bottomBar: {  padding: 16, overflowY: "auto" ,  bottom: 0, },
   message: { padding: 10, borderRadius: 8, background: "#f3f4f6", maxWidth: "70%" },
-  bottomBar: { borderTop: "1px solid #ddd", padding: 10 },
+  // bottomBar: { borderTop: "1px solid #ddd", padding: 10 },
   inputBox: { display: "flex", gap: 8, marginTop: 8 },
   uploadBox: {
   margin: "auto",
