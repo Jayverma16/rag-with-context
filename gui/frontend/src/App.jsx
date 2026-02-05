@@ -68,8 +68,11 @@ function App() {
       />
 
     {/* ========== CENTER ========== */}
-    <div style={styles.center}>
+
       {/* Upload state (centered perfectly) */}
+      <div style={styles.center}>
+
+      
       {!uploadedFile && (
         <div style={styles.uploadWrapper}>
           <UploadBox
@@ -80,25 +83,7 @@ function App() {
         </div>
       )}
 
-      {/* Chat state */}
-      {uploadedFile && (
-        <>
-          {/* Chat area */}
-          <div style={styles.chatArea}>
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                style={{
-                  ...styles.message,
-                  alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                }}
-              >
-                {m.content}
-              </div>
-            ))}
-            {loading && <div style={styles.message}>Thinking…</div>}
-          </div>
-
+        <div style={styles.bottomBar}>
           <BottomBar
             query={query}
             setQuery={setQuery}
@@ -107,13 +92,14 @@ function App() {
             mode={mode}
             setMode={setMode}
           />
-        </>
-      )}
-    </div>
-
-    </div>
-  );
+        </div>
+        </div>
+</div>)
 }
+
+
+  
+
 
 /* styles */
 const styles = {
