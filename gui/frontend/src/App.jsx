@@ -75,17 +75,17 @@ function App() {
       
 
       
-      {!uploadedFile && (
         <div style={styles.uploadWrapper}>
-          <div style={styles.dotSquar}>
-          <UploadBox
-            uploadStatus={uploadStatus}
-            setUploadStatus={setUploadStatus}
-            onUploadSuccess={setUploadedFile}
-          />
-          </div>
-        </div>
-      )}
+        {!uploadedFile && (
+            <div style={styles.dotSquar}>
+            <UploadBox
+              uploadStatus={uploadStatus}
+              setUploadStatus={setUploadStatus}
+              onUploadSuccess={setUploadedFile}
+            />
+            </div>
+        )}
+      </div>
       
 
         <div style={styles.bottomBar}>
@@ -134,7 +134,9 @@ const styles = {
   flex: 1,
   display: "flex",
   alignItems: "center",     // vertical center ✅
-  justifyContent: "center" // horizontal center ✅
+  justifyContent: "center", // horizontal center ✅
+  backgroundColor: "#f7feff",
+
 }
 };
 
