@@ -85,6 +85,9 @@ function App() {
             />
             </div>
         )}
+        {uploadedFile && (
+          <div><text> Waitting for the query</text></div>
+        )}
       </div>
       
 
