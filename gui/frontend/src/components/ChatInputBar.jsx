@@ -38,8 +38,8 @@ container: {
 textarea: {
   flex: 1,
   height: 40,
-  background: "#9c1515",
-  color: "#1bad1b",
+  background: "rgb(224 243 255)",
+  color: "rgb(203 224 246)",
   border: "none",
   padding: "8px 10px",
   borderRadius: 8,
