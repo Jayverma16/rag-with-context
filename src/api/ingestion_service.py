@@ -15,7 +15,7 @@ def ingest_file(file_path: str):
     # 🔑 TEMPORARY DESIGN CHOICE
     # We reuse your existing ingestion logic.
     # Next phase we will make this file-specific.
-    ingest_docs()
+    ingest_docs(file_path)
 
     return {
         "status": "success",
