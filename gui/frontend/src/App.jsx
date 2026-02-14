@@ -73,15 +73,20 @@ function App() {
       <div style={styles.center}>
 
       
+
+      
       {!uploadedFile && (
         <div style={styles.uploadWrapper}>
+          <div style={styles.dotSquar}>
           <UploadBox
             uploadStatus={uploadStatus}
             setUploadStatus={setUploadStatus}
             onUploadSuccess={setUploadedFile}
           />
+          </div>
         </div>
       )}
+      
 
         <div style={styles.bottomBar}>
           <BottomBar
@@ -112,7 +117,19 @@ const styles = {
   uploadBox: {
   margin: "auto",
   textAlign: "center",
-},
+  },
+  dotSquar: {
+    border: "2px dashed  #bbb",
+    width: "60%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "40px",
+    backgroundColor: "#f5f7fa",
+    borderRadius: "16px",
+    margin: "20px 0"
+  },
+
   uploadWrapper: {
   flex: 1,
   display: "flex",
