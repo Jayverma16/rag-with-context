@@ -1,7 +1,7 @@
 import Lottie from "lottie-react";
 import UploadIcon from "../assets/file_upload_logo.png";
 import uploadingAnimation from "../assets/Uploading.json";
-import { uploadFile } from "../services/api";
+import { uploadFile,ingestFile } from "../services/api";
 
 function UploadBox({
   onUploadSuccess,
@@ -48,6 +48,7 @@ function UploadBox({
                 const res = await uploadFile(file);
                 setUploadStatus(`Uploaded: ${res.filename}`);
                 onUploadSuccess(res.filename);
+                ingestFile(filename)
               } catch (err) {
                 console.error(err);
                 setUploadStatus("❌ Upload failed");

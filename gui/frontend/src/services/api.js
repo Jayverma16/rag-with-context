@@ -1,48 +1,48 @@
-export async function chat(query, mode) {
-  const res = await fetch("http://127.0.0.1:8000/chat", {
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
+async function request(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, options);
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(detail || "API request failed");
+  }
+  return res.json();
+}
+
+export function listDocuments() {
+  return request("/documents");
+}
+
+export function uploadDocuments(files) {
+  const formData = new FormData();
+  Array.from(files).forEach((file) => formData.append("files", file));
+  return request("/documents/upload", {
+    method: "POST",
+    body: formData,
+  });
+}
+
+export function ingestDocument(documentId) {
+  return request(`/documents/${documentId}/ingest`, {
+    method: "POST",
+  });
+}
+
+export function loadChunks(documentId) {
+  return request(`/documents/${documentId}/chunks`);
+}
+
+export function chat({ question, documentIds, mode, topK }) {
+  return request("/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ query, mode }),
+    body: JSON.stringify({
+      question,
+      document_ids: documentIds,
+      mode,
+      top_k: topK,
+    }),
   });
-
-  if (!res.ok) {
-    throw new Error("API error");
-  }
-
-  return res.json();
 }
-
-export async function uploadFile(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const res = await fetch("http://127.0.0.1:8000/upload", {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!res.ok) {
-    throw new Error("Upload failed");
-  }
-
-  return res.json();
-}
-
-
-export async function ingestFile(filename) {
-  const res = await fetch("http://127.0.0.1:8000/ingest", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ filename }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Ingest failed");
-  }
-
-  return res.json();
-}
-
-
